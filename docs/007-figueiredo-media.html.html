@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tochi — Proposta Figueiredo Media</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;600;700;800;900&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --black: #0d0d0d;
+  --white: #f5f5f0;
+  --red: #e01010;
+  --gray: #2a2a2a;
+  --gray-mid: #444;
+  --gray-light: #888;
+}
+body { background: var(--black); color: var(--white); font-family: 'Barlow Condensed', sans-serif; min-height: 100vh; overflow-x: hidden; }
+.page { max-width: 900px; margin: 0 auto; padding: 0 2rem 6rem; }
+
+/* ── ACCEPTED BANNER ── */
+.accepted-banner {
+  display: none;
+  background: var(--white);
+  color: var(--black);
+  padding: 1rem 2rem;
+  align-items: center;
+  gap: 1rem;
+}
+.accepted-banner.visible { display: flex; }
+.ab-check {
+  width: 32px; height: 32px; background: #1a7a3c; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.ab-check svg { width: 16px; height: 16px; fill: #fff; }
+.ab-text { flex: 1; }
+.ab-title { font-size: 1rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; color: var(--black); }
+.ab-sub { font-family: 'DM Mono', monospace; font-size: 0.65rem; color: #555; letter-spacing: 0.06em; margin-top: 0.1rem; }
+.ab-badge { font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; background: #1a7a3c; color: #fff; padding: 0.3rem 0.8rem; flex-shrink: 0; }
+
+/* ── HEADER ── */
+header { display: flex; justify-content: space-between; align-items: center; padding: 2rem 0; border-bottom: 1px solid var(--gray); }
+.logo-lg { display: block; width: 52px; }
+.logo-sm { display: block; width: 36px; }
+.doc-meta { text-align: right; font-family: 'DM Mono', monospace; font-size: 0.72rem; color: var(--gray-light); line-height: 1.8; letter-spacing: 0.04em; }
+.doc-meta span { color: var(--white); }
+
+/* ── HERO ── */
+.hero { padding: 5rem 0 4rem; border-bottom: 1px solid var(--gray); }
+.label { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--red); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.6rem; }
+.label::before { content: ''; display: inline-block; width: 18px; height: 2px; background: var(--red); flex-shrink: 0; }
+.hero-title { font-size: clamp(3.5rem, 8vw, 6.5rem); font-weight: 900; line-height: 0.92; letter-spacing: -0.01em; text-transform: uppercase; margin-bottom: 2rem; }
+.hero-title em { font-style: normal; color: var(--red); }
+.client-tag { display: inline-flex; align-items: center; gap: 0.75rem; background: var(--gray); border: 1px solid #333; padding: 0.5rem 1rem; font-size: 0.9rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--gray-light); }
+.client-tag strong { color: var(--white); }
+
+/* ── PORTFOLIO CAROUSEL ── */
+.portfolio-section { padding: 3rem 0; border-bottom: 1px solid var(--gray); }
+.portfolio-header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 1.5rem; }
+.portfolio-title { font-size: 0.72rem; font-family: 'DM Mono', monospace; letter-spacing: 0.16em; text-transform: uppercase; color: var(--gray-light); }
+.portfolio-link { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--red); text-decoration: none; border-bottom: 1px solid var(--red); padding-bottom: 0.1rem; }
+.portfolio-link:hover { opacity: 0.7; }
+
+.carousel-outer { position: relative; }
+.carousel {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 2px;
+}
+.carousel::-webkit-scrollbar { display: none; }
+
+.proj-card {
+  flex: 0 0 260px;
+  scroll-snap-align: start;
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+}
+.proj-thumb {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #151515;
+  border: 1px solid var(--gray);
+  position: relative;
+  overflow: hidden;
+}
+.proj-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.3s; }
+.proj-card:hover .proj-thumb img { transform: scale(1.04); }
+.proj-thumb-placeholder {
+  width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+  background: #151515;
+  position: relative;
+}
+/* subtle grid pattern on placeholder */
+.proj-thumb-placeholder::before {
+  content: '';
+  position: absolute; inset: 0;
+  background-image: linear-gradient(var(--gray) 1px, transparent 1px), linear-gradient(90deg, var(--gray) 1px, transparent 1px);
+  background-size: 24px 24px;
+  opacity: 0.4;
+}
+.play-icon { position: relative; z-index: 1; width: 36px; height: 36px; border: 1.5px solid rgba(245,245,240,0.3); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+.play-icon svg { width: 14px; height: 14px; fill: rgba(245,245,240,0.5); margin-left: 2px; }
+.proj-category {
+  position: absolute; top: 0.6rem; left: 0.6rem; z-index: 2;
+  font-family: 'DM Mono', monospace; font-size: 0.6rem; letter-spacing: 0.12em; text-transform: uppercase;
+  background: var(--red); color: #fff; padding: 0.2rem 0.5rem;
+}
+.proj-thumb-label {
+  position: absolute; bottom: 0; left: 0; right: 0; z-index: 2;
+  background: linear-gradient(transparent, rgba(0,0,0,0.75));
+  padding: 1.5rem 0.75rem 0.6rem;
+  font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em;
+  color: rgba(245,245,240,0.9);
+}
+.proj-meta { padding: 0.6rem 0 0; display: flex; align-items: baseline; justify-content: space-between; }
+.proj-name { font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; color: var(--gray-light); }
+.proj-arrow { font-size: 0.8rem; color: var(--gray-mid); }
+.proj-card:hover .proj-name { color: var(--white); }
+.proj-card:hover .proj-arrow { color: var(--red); }
+
+.carousel-nav { display: flex; gap: 8px; margin-top: 1rem; justify-content: flex-end; }
+.nav-btn { width: 32px; height: 32px; border: 1px solid var(--gray); background: transparent; color: var(--gray-light); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; transition: border-color 0.15s, color 0.15s; }
+.nav-btn:hover { border-color: var(--white); color: var(--white); }
+
+/* ── SECTIONS ── */
+.section { padding: 4rem 0; border-bottom: 1px solid var(--gray); }
+.section-header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 2.5rem; }
+.section-title { font-size: 0.72rem; font-family: 'DM Mono', monospace; letter-spacing: 0.16em; text-transform: uppercase; color: var(--gray-light); }
+.section-num { font-size: 0.68rem; font-family: 'DM Mono', monospace; color: #333; letter-spacing: 0.1em; }
+
+/* ── DELIVERABLES ── */
+.deliverables { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--gray); border: 1px solid var(--gray); }
+.deliverable-item { background: var(--black); padding: 1.75rem 2rem; display: flex; flex-direction: column; gap: 0.4rem; }
+.deliverable-item:hover { background: #111; }
+.d-label { font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gray-light); }
+.d-value { font-size: 1.6rem; font-weight: 700; letter-spacing: -0.01em; text-transform: uppercase; }
+.d-value.red { color: var(--red); }
+.d-sub { font-size: 0.8rem; font-weight: 400; color: var(--gray-light); text-transform: none; letter-spacing: 0; }
+
+/* ── SERVICES ── */
+.services-list { display: flex; flex-direction: column; }
+.service-row { display: flex; align-items: center; justify-content: space-between; padding: 1.4rem 0; border-bottom: 1px solid #1c1c1c; gap: 1rem; }
+.service-row:last-child { border-bottom: none; }
+.service-name { font-size: 1.4rem; font-weight: 700; letter-spacing: 0.02em; text-transform: uppercase; }
+.service-desc { font-size: 0.8rem; color: var(--gray-light); font-weight: 400; margin-top: 0.15rem; font-family: 'DM Mono', monospace; letter-spacing: 0.03em; }
+.service-check { width: 10px; height: 10px; background: var(--red); flex-shrink: 0; }
+.revision-callout { margin-top: 2rem; border: 1px solid var(--gray); padding: 1rem 1.5rem; display: flex; align-items: center; gap: 1rem; }
+.revision-dot { width: 6px; height: 6px; background: var(--red); flex-shrink: 0; }
+.revision-text { font-family: 'DM Mono', monospace; font-size: 0.72rem; color: var(--gray-light); letter-spacing: 0.04em; line-height: 1.5; }
+.revision-text strong { color: var(--white); }
+
+/* ── PRICING ── */
+.price-block { padding: 4rem 0; border-bottom: 1px solid var(--gray); }
+.price-main { display: flex; align-items: flex-end; gap: 1rem; margin: 2rem 0; }
+.price-currency { font-size: 2rem; font-weight: 300; color: var(--gray-light); line-height: 1; margin-bottom: 0.6rem; }
+.price-value { font-size: clamp(5rem, 12vw, 8rem); font-weight: 900; line-height: 0.9; letter-spacing: -0.03em; }
+.price-cents { font-size: 2.5rem; font-weight: 700; color: var(--gray-mid); line-height: 1; margin-bottom: 0.5rem; }
+.price-meta { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--gray-light); letter-spacing: 0.06em; margin-bottom: 2rem; }
+.price-meta strong { color: var(--white); }
+
+.payment-options { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--gray); border: 1px solid var(--gray); }
+.payment-opt { background: var(--black); padding: 1.5rem 2rem; display: flex; flex-direction: column; }
+.payment-opt.featured { background: var(--red); }
+.payment-opt.featured .p-label { color: rgba(255,255,255,0.6); }
+.payment-opt.featured .p-desc { color: rgba(255,255,255,0.85); }
+.p-label { font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gray-light); margin-bottom: 0.5rem; }
+.p-title { font-size: 1.3rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.02em; margin-bottom: 0.35rem; }
+.p-desc { font-size: 0.78rem; color: var(--gray-light); font-family: 'DM Mono', monospace; line-height: 1.5; }
+.badge { display: inline-block; font-family: 'DM Mono', monospace; font-size: 0.6rem; letter-spacing: 0.1em; padding: 0.2rem 0.5rem; margin-top: 0.6rem; margin-bottom: 1.25rem; }
+.badge-dark { background: var(--gray); color: var(--gray-light); }
+.badge-light { background: rgba(255,255,255,0.15); color: #fff; }
+
+/* ── WA BUTTON ── */
+.wa-btn { display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-top: auto; padding: 0.75rem 1rem; font-family: 'Barlow Condensed', sans-serif; font-size: 0.85rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; text-decoration: none; border: 1px solid rgba(255,255,255,0.2); color: var(--white); background: transparent; cursor: pointer; transition: background 0.15s, border-color 0.15s; }
+.wa-btn:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.4); }
+.payment-opt.featured .wa-btn { border-color: rgba(255,255,255,0.4); }
+.payment-opt.featured .wa-btn:hover { background: rgba(255,255,255,0.15); }
+.wa-icon { width: 15px; height: 15px; fill: currentColor; flex-shrink: 0; }
+/* accepted state: disable buttons */
+body.is-accepted .wa-btn, body.is-accepted .cta-btn { pointer-events: none; opacity: 0.25; }
+body.is-accepted .wa-btn::after { content: '— proposta fechada'; margin-left: 0.5rem; font-size: 0.7rem; opacity: 0.6; }
+
+/* ── PIX ── */
+.pix-block { padding: 4rem 0; border-bottom: 1px solid var(--gray); }
+.pix-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--gray); border: 1px solid var(--gray); }
+.pix-item { background: var(--black); padding: 1.5rem 2rem; display: flex; flex-direction: column; gap: 0.35rem; }
+.pix-item.full { grid-column: 1 / -1; }
+.pix-sub { font-family: 'DM Mono', monospace; font-size: 0.65rem; color: var(--gray-light); letter-spacing: 0.1em; text-transform: uppercase; }
+.pix-key { font-size: 1.5rem; font-weight: 800; color: var(--red); }
+.pix-val { font-family: 'DM Mono', monospace; font-size: 0.78rem; color: var(--white); letter-spacing: 0.04em; }
+
+/* ── TIMELINE ── */
+.timeline-wrap { position: relative; padding-top: 0.5rem; }
+.timeline-track { position: absolute; top: 2.6rem; left: 0; right: 0; height: 1px; background: var(--gray); z-index: 0; }
+.timeline-steps { display: grid; grid-template-columns: repeat(3, 1fr); position: relative; z-index: 1; }
+.tl-step { display: flex; flex-direction: column; }
+.tl-step:nth-child(2) { align-items: center; }
+.tl-step:last-child { align-items: flex-end; }
+.tl-node { width: 18px; height: 18px; border: 1px solid var(--gray-mid); background: var(--black); display: flex; align-items: center; justify-content: center; margin-bottom: 1.4rem; flex-shrink: 0; }
+.tl-node::after { content: ''; width: 6px; height: 6px; background: var(--gray-mid); display: block; }
+.tl-node.active { border-color: var(--red); }
+.tl-node.active::after { background: var(--red); }
+.tl-label { font-size: 1.3rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.04em; color: var(--white); line-height: 1; margin-bottom: 0.35rem; }
+.tl-label.red { color: var(--red); }
+.tl-day { font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gray-light); margin-bottom: 0.4rem; }
+.tl-desc { font-family: 'DM Mono', monospace; font-size: 0.65rem; color: var(--gray-light); letter-spacing: 0.03em; line-height: 1.55; }
+.tl-step:nth-child(2) .tl-label, .tl-step:nth-child(2) .tl-day, .tl-step:nth-child(2) .tl-desc { text-align: center; }
+.tl-step:last-child .tl-label, .tl-step:last-child .tl-day, .tl-step:last-child .tl-desc { text-align: right; }
+
+/* ── NEXT STEPS ── */
+.steps-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--gray); border: 1px solid var(--gray); }
+.step-item { background: var(--black); padding: 1.5rem 2rem; }
+.step-num { font-family: 'DM Mono', monospace; font-size: 0.65rem; color: var(--red); letter-spacing: 0.1em; margin-bottom: 0.6rem; }
+.step-name { font-size: 1rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 0.3rem; }
+.step-desc { font-family: 'DM Mono', monospace; font-size: 0.65rem; color: var(--gray-light); line-height: 1.55; letter-spacing: 0.03em; }
+
+/* ── TERMOS ── */
+.termos { padding: 4rem 0; border-bottom: 1px solid var(--gray); }
+.termos-list { display: flex; flex-direction: column; }
+.termo-item { display: flex; gap: 2rem; padding: 1.5rem 0; border-bottom: 1px solid #1a1a1a; }
+.termo-item:last-child { border-bottom: none; }
+.termo-num { font-family: 'DM Mono', monospace; font-size: 0.65rem; color: var(--red); letter-spacing: 0.1em; min-width: 2rem; padding-top: 0.1rem; flex-shrink: 0; }
+.termo-text { font-size: 0.88rem; color: var(--gray-light); line-height: 1.65; font-family: 'DM Mono', monospace; letter-spacing: 0.01em; }
+.termo-text strong { color: var(--white); font-weight: 500; }
+
+/* ── CTA FINAL ── */
+.cta-final { padding: 4rem 0; border-bottom: 1px solid var(--gray); text-align: center; }
+.cta-validity { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gray-light); margin-bottom: 1.5rem; }
+.cta-validity span { color: var(--red); }
+.cta-btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.6rem; padding: 1rem 2.5rem; font-family: 'Barlow Condensed', sans-serif; font-size: 1rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; text-decoration: none; background: var(--red); color: var(--white); border: none; cursor: pointer; transition: opacity 0.15s; }
+.cta-btn:hover { opacity: 0.88; }
+.cta-sub { font-family: 'DM Mono', monospace; font-size: 0.65rem; color: var(--gray-light); letter-spacing: 0.08em; margin-top: 1rem; }
+
+/* ── FOOTER ── */
+footer { padding: 4rem 0 0; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 2rem; }
+.footer-brand { display: flex; flex-direction: column; gap: 0.4rem; }
+.footer-site { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--gray-light); letter-spacing: 0.08em; }
+.footer-site span { color: var(--red); }
+.footer-contact { text-align: right; font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--gray-light); line-height: 2; letter-spacing: 0.04em; }
+.footer-contact strong { color: var(--white); font-weight: 500; }
+.accent-bar { height: 4px; background: var(--red); width: 100%; margin-top: 3rem; }
+body.is-accepted .accent-bar { background: #1a7a3c; }
+
+@media (max-width: 620px) {
+  .deliverables, .payment-options, .pix-grid, .steps-grid { grid-template-columns: 1fr; }
+  .pix-item.full { grid-column: 1; }
+  .hero-title { font-size: 3.2rem; }
+  header { flex-direction: column; align-items: flex-start; gap: 1.5rem; }
+  .doc-meta { text-align: left; }
+  footer { flex-direction: column; }
+  .footer-contact { text-align: left; }
+  .timeline-steps { grid-template-columns: 1fr; gap: 2.5rem; }
+  .timeline-track { display: none; }
+  .tl-step:nth-child(2), .tl-step:last-child { align-items: flex-start; }
+  .tl-step:nth-child(2) .tl-label, .tl-step:nth-child(2) .tl-day, .tl-step:nth-child(2) .tl-desc,
+  .tl-step:last-child .tl-label, .tl-step:last-child .tl-day, .tl-step:last-child .tl-desc { text-align: left; }
+  .accepted-banner { flex-wrap: wrap; }
+  .ab-badge { margin-top: 0.5rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- ACCEPTED BANNER (visible when ?status=aprovado) -->
+<div class="accepted-banner" id="acceptedBanner">
+  <div class="ab-check">
+    <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+  </div>
+  <div class="ab-text">
+    <div class="ab-title">Proposta aceita — projeto confirmado</div>
+    <div class="ab-sub">Entraremos em contato em até 24h para alinhar o kick-off</div>
+  </div>
+  <div class="ab-badge">✓ Fechado</div>
+</div>
+
+<div class="page">
+
+  <!-- HEADER -->
+  <header>
+    <svg class="logo-lg" viewBox="315 320 450 437" xmlns="http://www.w3.org/2000/svg">
+      <polygon fill="#f5f5f0" points="363.46 380.03 363.46 723.53 390.46 723.53 390.46 756.84 330.72 756.84 330.72 380.03 315.21 380.03 315.21 348.43 330.72 348.43 330.72 320.29 363.46 320.29 363.46 348.43 390.46 348.43 390.46 380.03 363.46 380.03"/>
+      <path fill="#f5f5f0" d="M480.75,330.63c-6.71-6.9-17.33-10.34-31.88-10.34s-25.09,3.44-31.6,10.34c-6.51,6.89-9.76,18-9.76,33.31v351.54c0,15.32,3.35,26.53,10.05,33.61,6.7,7.09,17.32,10.62,31.88,10.62s25.08-3.63,31.59-10.91c6.51-7.27,9.77-18.38,9.77-33.32v-351.54c0-15.31-3.36-26.42-10.05-33.31ZM458.06,728.12h-17.81v-376.24h17.81v376.24Z"/>
+      <path fill="#f5f5f0" d="M597.06,528.23v-164.29c0-15.31-3.35-26.42-10.05-33.31-6.7-6.9-17.33-10.34-31.88-10.34s-25.08,3.44-31.59,10.34c-6.52,6.89-9.77,18-9.77,33.31v345.8c0,17.62,3.25,30.35,9.77,38.2,6.51,7.85,17.23,11.77,32.17,11.77s25.07-3.92,31.59-11.77c6.51-7.85,9.76-20.58,9.76-38.2v-111.44h-32.74v129.82h-17.8v-376.24h17.8v176.35h32.74Z"/>
+      <path fill="#f5f5f0" d="M652.78,377.75v-57.46h-32.74v436.55h32.74v-346.87h17.81v346.87h32.74v-379.13l-50.55.04Z"/>
+      <path fill="#f5f5f0" d="M732.04,377.73v379.11h32.75v-379.11h-32.75Z"/>
+      <path fill="red" d="M668.26,320.29v42.5h96.53v-42.5h-96.53Z"/>
+    </svg>
+    <div class="doc-meta">
+      PROPOSTA COMERCIAL &nbsp;·&nbsp; <span>N.º 007</span><br>
+      DATA <span>02/04/2026</span><br>
+      VÁLIDA ATÉ <span>30/04/2026</span>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="label">Proposta para</div>
+    <h1 class="hero-title">After<em>movie</em><br>de casamento</h1>
+    <div class="client-tag">Cliente &nbsp;<strong>Figueiredo Media</strong></div>
+  </div>
+
+  <!-- PORTFOLIO CAROUSEL -->
+  <div class="portfolio-section">
+    <div class="portfolio-header">
+      <span class="portfolio-title">Trabalhos similares</span>
+      <a class="portfolio-link" href="https://tochi.com.br" target="_blank" rel="noopener">tochi.com.br ↗</a>
+    </div>
+    <div class="carousel-outer">
+      <div class="carousel" id="carousel">
+
+        <!-- Card 1: com thumbnail real -->
+        <a class="proj-card" href="https://tochi.com.br" target="_blank" rel="noopener">
+          <div class="proj-thumb">
+            <div class="proj-thumb-placeholder">
+              <div class="play-icon">
+                <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              </div>
+            </div>
+            <div class="proj-category">Motion Design</div>
+            <div class="proj-thumb-label">Série Institucional — Opex</div>
+          </div>
+          <div class="proj-meta">
+            <span class="proj-name">Motion · 12 vídeos</span>
+            <span class="proj-arrow">→</span>
+          </div>
+        </a>
+
+        <!-- Card 2 -->
+        <a class="proj-card" href="https://tochi.com.br" target="_blank" rel="noopener">
+          <div class="proj-thumb">
+            <div class="proj-thumb-placeholder">
+              <div class="play-icon">
+                <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              </div>
+            </div>
+            <div class="proj-category">Cobertura</div>
+            <div class="proj-thumb-label">VTex Day — Agência Método</div>
+          </div>
+          <div class="proj-meta">
+            <span class="proj-name">Evento · 2 câmeras</span>
+            <span class="proj-arrow">→</span>
+          </div>
+        </a>
+
+        <!-- Card 3 -->
+        <a class="proj-card" href="https://tochi.com.br" target="_blank" rel="noopener">
+          <div class="proj-thumb">
+            <div class="proj-thumb-placeholder">
+              <div class="play-icon">
+                <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              </div>
+            </div>
+            <div class="proj-category">Motion Design</div>
+            <div class="proj-thumb-label">Filme Institucional — Pipelovers</div>
+          </div>
+          <div class="proj-meta">
+            <span class="proj-name">Motion · 1:30min</span>
+            <span class="proj-arrow">→</span>
+          </div>
+        </a>
+
+        <!-- Card 4 -->
+        <a class="proj-card" href="https://tochi.com.br" target="_blank" rel="noopener">
+          <div class="proj-thumb">
+            <div class="proj-thumb-placeholder">
+              <div class="play-icon">
+                <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              </div>
+            </div>
+            <div class="proj-category">Edição</div>
+            <div class="proj-thumb-label">Conteúdo Mensal — Emmanuel</div>
+          </div>
+          <div class="proj-meta">
+            <span class="proj-name">Edição · redes sociais</span>
+            <span class="proj-arrow">→</span>
+          </div>
+        </a>
+
+      </div>
+      <div class="carousel-nav">
+        <button class="nav-btn" id="prevBtn" onclick="scrollCarousel(-1)">←</button>
+        <button class="nav-btn" id="nextBtn" onclick="scrollCarousel(1)">→</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 01 ESCOPO -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-title">Escopo do projeto</span>
+      <span class="section-num">01</span>
+    </div>
+    <div class="deliverables">
+      <div class="deliverable-item">
+        <div class="d-label">Entregável</div>
+        <div class="d-value">1 Vídeo</div>
+        <div class="d-sub">Aftermovie horizontal · 1 minuto</div>
+      </div>
+      <div class="deliverable-item">
+        <div class="d-label">Formato</div>
+        <div class="d-value">16:9</div>
+        <div class="d-sub">Full HD · H.264</div>
+      </div>
+      <div class="deliverable-item">
+        <div class="d-label">Material</div>
+        <div class="d-value red">Cliente</div>
+        <div class="d-sub">Footage bruta fornecida pelo cliente</div>
+      </div>
+      <div class="deliverable-item">
+        <div class="d-label">Prazo</div>
+        <div class="d-value">10</div>
+        <div class="d-sub">Dias úteis a partir do kick-off</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 02 O QUE ESTÁ INCLUSO -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-title">O que está incluso</span>
+      <span class="section-num">02</span>
+    </div>
+    <div class="services-list">
+      <div class="service-row">
+        <div>
+          <div class="service-name">Edição</div>
+          <div class="service-desc">Seleção, corte e montagem criativa do material bruto</div>
+        </div>
+        <div class="service-check"></div>
+      </div>
+      <div class="service-row">
+        <div>
+          <div class="service-name">Color Grade</div>
+          <div class="service-desc">Correção e tratamento cromático do vídeo</div>
+        </div>
+        <div class="service-check"></div>
+      </div>
+      <div class="service-row">
+        <div>
+          <div class="service-name">Motion</div>
+          <div class="service-desc">Tipografia animada, overlays e elementos gráficos</div>
+        </div>
+        <div class="service-check"></div>
+      </div>
+      <div class="service-row">
+        <div>
+          <div class="service-name">Sound Design</div>
+          <div class="service-desc">SFX, sync de áudio e mixagem da trilha</div>
+        </div>
+        <div class="service-check"></div>
+      </div>
+    </div>
+    <div class="revision-callout">
+      <div class="revision-dot"></div>
+      <div class="revision-text"><strong>2 rodadas de revisão inclusas</strong> — ajustes aplicados ao vídeo como um todo, não por etapa.</div>
+    </div>
+  </div>
+
+  <!-- 03 INVESTIMENTO -->
+  <div class="price-block">
+    <div class="section-header">
+      <span class="section-title">Investimento</span>
+      <span class="section-num">03</span>
+    </div>
+    <div class="price-main">
+      <div class="price-currency">R$</div>
+      <div class="price-value">900</div>
+      <div class="price-cents">,00</div>
+    </div>
+    <div class="price-meta">Entrega em <strong>10 dias úteis</strong> a partir do kick-off</div>
+    <div class="payment-options">
+      <div class="payment-opt">
+        <div class="p-label">Padrão</div>
+        <div class="p-title">50% + 50%</div>
+        <div class="p-desc">R$450 na aprovação<br>R$450 na entrega final</div>
+        <div class="badge badge-dark">SEM DESCONTO</div>
+        <a class="wa-btn" href="https://wa.me/5511966488535?text=Ol%C3%A1%2C%20quero%20aprovar%20a%20proposta%20007%20%E2%80%94%20Aftermovie%20de%20Casamento%20na%20op%C3%A7%C3%A3o%2050%25%20%2B%2050%25%20(R%24900%2C00)." target="_blank" rel="noopener">
+          <svg class="wa-icon" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+          Aceitar esta opção
+        </a>
+      </div>
+      <div class="payment-opt featured">
+        <div class="p-label">Melhor opção</div>
+        <div class="p-title">100% Antecipado</div>
+        <div class="p-desc">R$810 antes do início<br>10% de desconto aplicado</div>
+        <div class="badge badge-light">— 10% · ECONOMIA R$90</div>
+        <a class="wa-btn" href="https://wa.me/5511966488535?text=Ol%C3%A1%2C%20quero%20aprovar%20a%20proposta%20007%20%E2%80%94%20Aftermovie%20de%20Casamento%20na%20op%C3%A7%C3%A3o%20100%25%20antecipado%20(R%24810%2C00)." target="_blank" rel="noopener">
+          <svg class="wa-icon" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+          Aceitar esta opção
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 04 DADOS PARA PAGAMENTO -->
+  <div class="pix-block">
+    <div class="section-header">
+      <span class="section-title">Dados para pagamento</span>
+      <span class="section-num">04</span>
+    </div>
+    <div class="pix-grid">
+      <div class="pix-item full">
+        <div class="pix-sub">Chave Pix</div>
+        <div class="pix-key">eduardo@tochi.com.br</div>
+      </div>
+      <div class="pix-item">
+        <div class="pix-sub">Banco</div>
+        <div class="pix-val">Inter · 077</div>
+      </div>
+      <div class="pix-item">
+        <div class="pix-sub">Favorecido</div>
+        <div class="pix-val">Eduardo Bertochi</div>
+      </div>
+      <div class="pix-item">
+        <div class="pix-sub">Agência / Conta</div>
+        <div class="pix-val">0001 · 465832938</div>
+      </div>
+      <div class="pix-item">
+        <div class="pix-sub">CNPJ</div>
+        <div class="pix-val">42.219.966/0001-64</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 05 CRONOGRAMA -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-title">Cronograma</span>
+      <span class="section-num">05</span>
+    </div>
+    <div class="timeline-wrap">
+      <div class="timeline-track"></div>
+      <div class="timeline-steps">
+        <div class="tl-step">
+          <div class="tl-node active"></div>
+          <div class="tl-label red">Kick-off</div>
+          <div class="tl-day">Dia 1</div>
+          <div class="tl-desc">Recebimento do material<br>bruto + 1ª parcela</div>
+        </div>
+        <div class="tl-step">
+          <div class="tl-node"></div>
+          <div class="tl-label">Review</div>
+          <div class="tl-day">Dia 7</div>
+          <div class="tl-desc">1ª versão entregue<br>para aprovação</div>
+        </div>
+        <div class="tl-step">
+          <div class="tl-node"></div>
+          <div class="tl-label">Entrega</div>
+          <div class="tl-day">Dia 10</div>
+          <div class="tl-desc">Versão final aprovada<br>e arquivos exportados</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 06 O QUE ACONTECE DEPOIS -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-title">O que acontece depois</span>
+      <span class="section-num">06</span>
+    </div>
+    <div class="steps-grid">
+      <div class="step-item">
+        <div class="step-num">PASSO 01</div>
+        <div class="step-name">Você aceita</div>
+        <div class="step-desc">Clica no botão acima e nos chama no WhatsApp com a opção escolhida</div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">PASSO 02</div>
+        <div class="step-name">Alinhamos</div>
+        <div class="step-desc">Confirmamos o recebimento em até 24h e alinhamos o envio dos arquivos</div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">PASSO 03</div>
+        <div class="step-name">Produção</div>
+        <div class="step-desc">Prazo começa após material recebido e 1ª parcela confirmada</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 07 CONDIÇÕES GERAIS -->
+  <div class="termos">
+    <div class="section-header">
+      <span class="section-title">Condições gerais</span>
+      <span class="section-num">07</span>
+    </div>
+    <div class="termos-list">
+      <div class="termo-item">
+        <div class="termo-num">01</div>
+        <div class="termo-text">O prazo começa a contar a partir do <strong>recebimento integral do material bruto</strong> e da confirmação de pagamento da primeira parcela.</div>
+      </div>
+      <div class="termo-item">
+        <div class="termo-num">02</div>
+        <div class="termo-text">Estão incluídas <strong>2 rodadas de revisão</strong> sobre o vídeo final. Revisões adicionais ou mudanças de escopo serão cobradas separadamente.</div>
+      </div>
+      <div class="termo-item">
+        <div class="termo-num">03</div>
+        <div class="termo-text">Em caso de cancelamento após o início, serão cobrados os custos já incorridos, com valor mínimo de <strong>30% do total aprovado</strong>.</div>
+      </div>
+      <div class="termo-item">
+        <div class="termo-num">04</div>
+        <div class="termo-text">A aprovação formal desta proposta, por e-mail ou mensagem, <strong>caracteriza aceite integral</strong> das condições aqui descritas.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA FINAL -->
+  <div class="cta-final">
+    <div class="cta-validity">Válida até <span>30 de abril de 2026</span></div>
+    <a class="cta-btn" href="https://wa.me/5511966488535?text=Ol%C3%A1%2C%20quero%20fechar%20a%20proposta%20007%20%E2%80%94%20Aftermovie%20de%20Casamento." target="_blank" rel="noopener">
+      <svg style="width:18px;height:18px;fill:currentColor;flex-shrink:0" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+      Fechar proposta via WhatsApp
+    </a>
+    <div class="cta-sub">Respondemos em até 24h após o contato</div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-brand">
+      <svg class="logo-sm" viewBox="315 320 450 437" xmlns="http://www.w3.org/2000/svg">
+        <polygon fill="#f5f5f0" points="363.46 380.03 363.46 723.53 390.46 723.53 390.46 756.84 330.72 756.84 330.72 380.03 315.21 380.03 315.21 348.43 330.72 348.43 330.72 320.29 363.46 320.29 363.46 348.43 390.46 348.43 390.46 380.03 363.46 380.03"/>
+        <path fill="#f5f5f0" d="M480.75,330.63c-6.71-6.9-17.33-10.34-31.88-10.34s-25.09,3.44-31.6,10.34c-6.51,6.89-9.76,18-9.76,33.31v351.54c0,15.32,3.35,26.53,10.05,33.61,6.7,7.09,17.32,10.62,31.88,10.62s25.08-3.63,31.59-10.91c6.51-7.27,9.77-18.38,9.77-33.32v-351.54c0-15.31-3.36-26.42-10.05-33.31ZM458.06,728.12h-17.81v-376.24h17.81v376.24Z"/>
+        <path fill="#f5f5f0" d="M597.06,528.23v-164.29c0-15.31-3.35-26.42-10.05-33.31-6.7-6.9-17.33-10.34-31.88-10.34s-25.08,3.44-31.59,10.34c-6.52,6.89-9.77,18-9.77,33.31v345.8c0,17.62,3.25,30.35,9.77,38.2,6.51,7.85,17.23,11.77,32.17,11.77s25.07-3.92,31.59-11.77c6.51-7.85,9.76-20.58,9.76-38.2v-111.44h-32.74v129.82h-17.8v-376.24h17.8v176.35h32.74Z"/>
+        <path fill="#f5f5f0" d="M652.78,377.75v-57.46h-32.74v436.55h32.74v-346.87h17.81v346.87h32.74v-379.13l-50.55.04Z"/>
+        <path fill="#f5f5f0" d="M732.04,377.73v379.11h32.75v-379.11h-32.75Z"/>
+        <path fill="red" d="M668.26,320.29v42.5h96.53v-42.5h-96.53Z"/>
+      </svg>
+      <div class="footer-site"><span>tochi</span>.com.br</div>
+    </div>
+    <div class="footer-contact">
+      <strong>Eduardo Bertochi</strong><br>
+      eduardo@tochi.com.br
+    </div>
+  </footer>
+  <div class="accent-bar"></div>
+
+</div>
+
+<script>
+// ── ACCEPTED STATE ──
+// Reads ?status=aprovado from URL and activates accepted visual state.
+// When client accepts: share the proposal link + "?status=aprovado" at the end.
+(function() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('status') === 'aprovado') {
+    document.body.classList.add('is-accepted');
+    document.getElementById('acceptedBanner').classList.add('visible');
+  }
+})();
+
+// ── CAROUSEL ──
+function scrollCarousel(dir) {
+  const c = document.getElementById('carousel');
+  const cardWidth = c.querySelector('.proj-card').offsetWidth + 12;
+  c.scrollBy({ left: dir * cardWidth, behavior: 'smooth' });
+}
+</script>
+
+</body>
+</html>
